@@ -1,0 +1,317 @@
+#!/bin/ksh
+
+# - - - - - - - - - - - - - - - -
+# WFRP2E Character Generator v1.3
+# - - - - - - - - - - - - - - - -
+
+usage() {
+    echo "usage: $0 [$races]" 1>&2
+    exit 1
+}
+
+races="dwarf|elf|halfling|human"
+race=$1
+
+[ $# -eq 1 ] || usage
+eval "
+case $race in
+    $races) ;;
+         *) usage;;
+esac
+"
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+awk -v race=$race '
+BEGIN {
+    w  = irand(1, 10)
+    fp = irand(1, 10)
+}
+
+/^#/ { next }
+/^$/ { next }
+
+$1 ~ /WS|BS|S|T|Ag|Int|WP|Fel/ && $2 == race  { char[$1] = $3 + irand(2, 20) }
+$1 ~ /W/  && $2 == race && ($3<=w && w<=$4)   { char[$1] = $5                }
+$1 ~ /M/  && $2 == race                       { char[$1] = $3                }
+$1 ~ /FP/ && $2 == race && ($3<=fp && fp<=$4) { char[$1] = $5                }
+
+END {
+    print "RACE: " toupper(substr(race, 1, 1)) substr(race, 2) "\n"
+
+    char["A"]   = 1
+    char["SB"]  = int(char["S"]/10)
+    char["TB"]  = int(char["T"]/10)
+    char["Mag"] = 0
+    char["IP"]  = 0
+
+    split("WS BS S T Ag Int WP Fel", prim)
+    split("A W SB TB M Mag IP FP", sec)
+
+    printf "Main Profile"
+    printf "\n+-----------------------------------------------+\n|"
+    for (i = 1; i <= 8; i++) printf "%4s |", prim[i]
+    printf "\n+-----------------------------------------------+\n|"
+    for (i = 1; i <= 8; i++) printf "%4s |", char[prim[i]]
+    printf "\n+-----------------------------------------------+\n"
+
+    printf "Secondary Profile"
+    printf "\n+-----------------------------------------------+\n|"
+    for (i = 1; i <= 8; i++) printf "%4s |", sec[i]
+    printf "\n+-----------------------------------------------+\n|"
+    for (i = 1; i <= 8; i++) printf "%4s |", char[sec[i]]
+    printf "\n+-----------------------------------------------+"
+}
+
+function irand(low, high,        n)
+{
+        do
+                n = low +  int(rand() * (high+1 - low))
+        while (n<low || high<n)
+
+        return n
+}' <<EOF
+# Table 2-1: Characteristic Generation
+WS    dwarf      30
+WS    elf        20
+WS    halfling   10
+WS    human      20
+
+BS    dwarf      20
+BS    elf        30
+BS    halfling   30
+BS    human      20
+
+S     dwarf      20
+S     elf        20
+S     halfling   10
+S     human      20
+
+T     dwarf      30
+T     elf        20
+T     halfling   10
+T     human      20
+
+Ag    dwarf      10
+Ag    elf        30
+Ag    halfling   30
+Ag    human      20
+
+Int   dwarf      20
+Int   elf        20
+Int   halfling   20
+Int   human      20
+
+WP    dwarf      20
+WP    elf        20
+WP    halfling   20
+WP    human      20
+
+Fel   dwarf      10
+Fel   elf        20
+Fel   halfling   30
+Fel   human      20
+
+M     dwarf       3
+M     elf         5
+M     halfling    4
+M     human       4
+
+# Table 2-2: Starting Wounds
+W   dwarf       1  3   11
+W   dwarf       4  6   12
+W   dwarf       7  9   13
+W   dwarf      10 10   14
+
+W   elf         1  3    9
+W   elf         4  6   10
+W   elf         7  9   11
+W   elf        10 10   12
+
+W   halfling    1  3    8
+W   halfling    4  6    9
+W   halfling    7  9   10
+W   halfling   10 10   11
+
+W   human       1  3   10
+W   human       4  6   11
+W   human       7  9   12
+W   human      10 10   13
+
+# Table 2-3: Starting Fate Points
+FP   dwarf      1  4   1
+FP   dwarf      5  7   2
+FP   dwarf      8 10   3
+
+FP   elf        1  4   1
+FP   elf        5  7   2
+FP   elf        8 10   2
+
+FP   halfling   1  4   2
+FP   halfling   5  7   2
+FP   halfling   8 10   3
+
+FP   human      1  4   2
+FP   human      5  7   3
+FP   human      8 10   3
+
+EOF
+
+talent=
+pick_random_talent() {
+    typeset n=$((($RANDOM % 100) + 1))
+    talent=`awk -v race=$1 -v n=$n '
+$1 == race && ($2<=n && n<=$3) { print $4 " " $5 " " $6 }' <<EOF
+
+# Table 2-4: Random Talents
+halfling   1  5    Acute Hearing
+halfling   6  10   Ambidextrous
+halfling   11 15   Coolheaded
+halfling   16 20   Excellent Vision
+halfling   21 25   Fleet Footed
+halfling   26 29   Hardy
+halfling   30 33   Lightning Reflexes
+halfling   34 38   Luck
+halfling   39 42   Marksman
+halfling   43 47   Mimic
+halfling   48 51   Resistance to Disease
+halfling   52 53   Resistance to Magic
+halfling   54 57   Resistance to Poison
+halfling   58 62   Savvy
+halfling   63 67   Sixth Sense
+halfling   68 72   Strong-minded
+halfling   73 77   Sturdy
+halfling   78 82   Suave
+halfling   83 87   Super Numerate
+halfling   88 91   Very Resilient
+halfling   92 95   Very Strong
+halfling   96 100  Warrior Born
+
+human      1 4     Acute Hearing
+human      5 9     Ambidextrous
+human      10 13   Coolheaded
+human      14 18   Excellent Vision
+human      19 22   Fleet Footed
+human      23 27   Hardy
+human      28 31   Lightning Reflexes
+human      32 35   Luck
+human      36 40   Marksman
+human      41 44   Mimic
+human      45 49   Night Vision
+human      50 53   Resistance to Disease
+human      54 57   Resistance to Magic
+human      58 61   Resistance to Poison
+human      62 66   Savvy
+human      67 71   Sixth Sense
+human      72 75   Strong-minded
+human      76 79   Sturdy
+human      80 83   Suave
+human      84 87   Super Numerate
+human      88 91   Very Resilient
+human      92 95   Very Strong
+human      96 100  Warrior Born
+
+EOF`
+}
+
+talent1=
+talent2=
+if [ $race == "halfling" ]; then
+    pick_random_talent $race
+    talent1=$talent
+elif [ $race == "human" ]; then
+    pick_random_talent $race
+    talent1=$talent
+    pick_random_talent $race
+    talent2=$talent
+    while [ "$talent1" == "$talent2" ]; do
+        pick_random_talent $race
+        talent2=$talent
+    done
+fi
+
+awk -v race=$race -v FS=":" '
+BEGIN {
+        rest  = 80 # remaining chars on line
+        entry =  0 # new entry should start with ,
+        first =  0 # except for the first one
+}
+
+$1 ~ /header/ {
+        rest = 80 - length($2) - 1
+        printf "\n\n" $2 ":"
+        first = 1
+}
+
+$1 == race {
+        if (first == 0) {
+            printf ","
+            rest--
+        } else {
+            first = 0
+        }
+        split($2, words, " ")
+        for (i = 1; i < 10 && words[i] != ""; i++) {
+            chars = length(words[i])
+            if ((rest - chars) <= 2) { # leave space for ,
+                printf "\n" words[i]
+                rest = 80 - chars
+            } else {
+                printf " " words[i]
+                rest -= ++chars
+            }
+        }
+}
+
+END {
+    print
+}' <<EOF
+# Racial Features
+header:SKILLS
+
+dwarf:Common Knowledge (Dwarfs)
+dwarf:Speak Language (Khazalid)
+dwarf:Speak Language (Reikspiel)
+dwarf:Trade (Miner, Smith, or Stoneworker)
+
+elf:Common Knowledge (Elves)
+elf:Speak Language (Eltharin)
+elf:Speak Language (Reikspiel)
+
+halfling:Academic Knowledge (Genealogy/Heraldry)
+halfling:Common Knowledge (Halflings)
+halfling:Gossip
+halfling:Speak Language (Halfling)
+halfling:Speak Language (Reikspiel)
+halfling:Trade (Cook or Farmer)
+
+human:Common Knowledge (the Empire)
+human:Gossip
+human:Speak Language (Reikspiel)
+
+
+header:TALENTS
+
+dwarf:Dwarfcraft
+dwarf:Grudge-born Fury
+dwarf:Night Vision
+dwarf:Resistance to Magic
+dwarf:Stout-hearted
+dwarf:Sturdy
+
+elf:Aethyric Attunement or Specialist Weapon Group (Longbow)
+elf:Coolheaded or Savvy
+elf:Excellent Vision
+elf:Night Vision
+
+halfling:Night Vision
+halfling:Resistance to Chaos
+halfling:Specialist Weapon Group (Sling)
+halfling:$talent1
+
+human:$talent1
+human:$talent2
+
+EOF
+
+# eof

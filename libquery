@@ -1,0 +1,26 @@
+# -*- shell-script -*-
+
+# AWK rules for querying OrgMode tables.
+
+# $ cat example.org
+# #!/bin/ksh
+# . libquery <<EOF
+#
+# |------------|
+# | foo | bar  |
+# | baz | quux |
+# |-----+------|
+#
+# EOF
+# $ ./example/org 1 foo
+
+awk -F"|" -v field="$1" -v value="$2" '
+/^#/ { next }
+
+/^\|/ {
+        split($0, fields)
+        if (tolower(fields[field+1]) ~ tolower(value))
+                print $0
+}'
+
+# eof

@@ -1,0 +1,60 @@
+#!/bin/ksh
+
+# Based on Luke Gorrie's `untar'.
+
+. libksh
+init
+
+cleanup() {
+    rm -rf $tmpdir
+}
+
+[ $# -eq 1 ] || usage file
+
+curdir=`pwd`
+tmpdir=$TMP/unpack.$$.$RANDOM
+
+file=${1##*/}
+path=$curdir/$file
+
+case $file in
+    *.zip)
+        cmd='unzip';;
+    *.rar)
+        cmd='unrar e';;
+    *.tar)
+        cmd='tar -xvf';;
+    *.tar.gz | *.tgz)
+        cmd='tar -xvzf';;
+    *.tar.bz2)
+        cmd='gtar bunzip2';;
+    *.tar.Z)
+        cmd='gtar uncompress';;
+    *)
+        err 'Unknown extension';;
+esac
+
+case $file in
+    *.tar.gz | *.tar.bz2 | *.tar.Z)
+        basename=${file%.tar*};;
+    *)
+        basename=${file%.*};;
+esac
+
+mkdir $tmpdir
+cd $tmpdir
+$cmd "$path"
+cd $curdir
+
+if [ $(ls $tmpdir | wc -l) -eq 1 ] && [ -d $tmpdir/* ]; then
+    targetdir=`ls $tmpdir`
+    mv -i $tmpdir/* .
+    echo "Unpacked neatly into $targetdir"
+else
+    mv -i $tmpdir "$basename"
+    echo "Unpacked messily into $basename"
+fi
+
+exit 0
+
+# eof

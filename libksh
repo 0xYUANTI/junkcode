@@ -1,0 +1,38 @@
+# -*- shell-script -*-
+
+TMP=/tmp
+
+# usage EXPECTED_ARGS --- print usage information and exit
+usage() {
+    local script=${0##/*/}
+    echo "usage: $script" $@ 1>&2
+    exit 1
+}
+
+
+# error MESSAGE --- print MESSAGE to stderr and exit
+err() {
+    echo $@ 1>&2
+    exit 1
+}
+
+
+# init --- register function `cleanup' as signal handler, set PATH and umask
+init() {
+    umask 077
+    set -e
+    export PATH=/bin:/usr/bin:/usr/local/bin
+
+    trap 'exit 1'  HUP INT PIPE QUIT TERM
+    trap 'cleanup' EXIT
+}
+
+
+# gtar COMMAND FILE --- decompress FILE using COMMAND then untar the result
+#   COMMAND must accept the -c option (see e.g. uncompress(1)).
+#   Example: gtar bunzip2 xyzzy.tar.bz2
+gtar() {
+    "$1" -c "$2" | tar -xvf -
+}
+
+# eof

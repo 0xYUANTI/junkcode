@@ -1,0 +1,30 @@
+#!/bin/ksh
+
+. libksh
+
+[ $# -eq 1 ]  || usage "file"
+file="$1"
+decrypted=${file%.nc}
+
+if [ -e $decrypted ]; then
+    err "File exists."
+fi
+
+oldmodes=`stty -g`
+stty -echo
+echo -n "Key: "
+read key; echo
+stty $oldmodes
+
+mcrypt -k $key -d $file > /dev/null 2>&1
+
+if [ $? -eq 0 ]; then
+    echo
+    cat $decrypted
+    rm -fP $decrypted
+    exit 0
+else
+    err "Bad key."
+fi
+
+# eof

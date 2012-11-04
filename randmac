@@ -1,0 +1,13 @@
+#!/bin/ksh
+
+. libksh
+
+[ $# -eq 1 ] || usage interface
+if="$1"
+
+# MAC address should be global and unicast
+lladdr=$(printf "%.2x:" $((($RANDOM % 256) & 252)); for _i in 1 2 3 4; do printf "%.2x:" $(($RANDOM % 256)); done; printf "%.2x"  $(($RANDOM % 256)))
+
+ifconfig $if lladdr $lladdr
+
+# eof

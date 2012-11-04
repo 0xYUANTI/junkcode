@@ -1,0 +1,23 @@
+#!/bin/ksh
+
+. libksh
+
+# -z
+# -e ssh is default on openbsd
+[ $# -gt 1 ] || usage "src ... dest"
+RSYNC_OPTS="-h -a -x --delete"
+DRY_RUN="-v --stats --dry-run"
+
+rsync $RSYNC_OPTS $DRY_RUN "$@" | most
+
+echo -n "OK? (y/n) "
+read ok; echo
+if [ $ok = "y" ]; then
+    rsync $RSYNC_OPTS "$@"
+else
+    echo "Aborting..."
+fi
+
+exit $?
+
+# eof
