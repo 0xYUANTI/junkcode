@@ -13,8 +13,8 @@ Manifest
 ========
 * card.scm      -- Query VTES spoiler DB.
 * careers.pl    -- WFRP2E careers as a Prolog DB.
-* cut.clj       -- Clojure implementation of Scheme's `cut' macro.
 * conc.erl      -- Conc-lists in Erlang.
+* cut.clj       -- Clojure implementation of Scheme's `cut' macro.
 * deal.scm      -- Compute card-draw probability tables.
 * flydabbrev.el -- On-the-fly dabbrevs for Emacs.
 * layout.awk    -- Style checker.
