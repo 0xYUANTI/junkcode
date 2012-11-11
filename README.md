@@ -17,6 +17,7 @@ Manifest
 * conc.erl      -- Conc-lists in Erlang.
 * deal.scm      -- Compute card-draw probability tables.
 * flydabbrev.el -- On-the-fly dabbrevs for Emacs.
+* layout.awk    -- Style checker.
 * libksh        -- Shell utilities.
 * libquery      -- Query OrgMode tables via AWK.
 * mcat          -- cat(1) for mcrypt(1).
