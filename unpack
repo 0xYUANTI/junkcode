@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/sh
 
 # Based on Luke Gorrie's `untar'.
 
