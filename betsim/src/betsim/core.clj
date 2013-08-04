@@ -1,3 +1,5 @@
+;; http://derk.badbeatscrew.com/gambling/gambling-theory-problempuzzle-solution/
+
 (ns betsim.core
   (use incanter.core
        incanter.stats))
