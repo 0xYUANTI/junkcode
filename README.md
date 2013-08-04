@@ -11,6 +11,7 @@ C.f. http://www.samba.org/junkcode/
 
 Manifest
 ========
+* betsim        -- betting simulation
 * card.scm      -- Query VTES spoiler DB.
 * careers.pl    -- WFRP2E careers as a Prolog DB.
 * conc.erl      -- Conc-lists in Erlang.
